@@ -63,61 +63,60 @@ class BottomNav extends ConsumerWidget {
                 top: AppSpacing.navTopPadding,
                 bottom: AppSpacing.navBottomPadding + bottomPadding,
               ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Semantics(
-                  label: 'Home navigation button',
-                  button: true,
-                  enabled: true,
-                  selected: currentIndex == 0,
-                  child: _NavItem(
-                    icon: AppIcons.home(
-                      size: 22,
-                      color: currentIndex == 0 ? AppColors.accent : AppColors.textMuted,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Semantics(
+                    label: 'Home navigation button',
+                    button: true,
+                    enabled: true,
+                    selected: currentIndex == 0,
+                    child: _NavItem(
+                      icon: AppIcons.home(
+                        size: 22,
+                        color: currentIndex == 0 ? AppColors.accent : AppColors.textMuted,
+                      ),
+                      label: 'Home',
+                      isActive: currentIndex == 0,
+                      onTap: () {
+                        ref.read(navigationIndexProvider.notifier).state = 0;
+                        context.go(AppRoutes.dashboard);
+                      },
                     ),
-                    label: 'Home',
-                    isActive: currentIndex == 0,
-                    onTap: () {
-                      ref.read(navigationIndexProvider.notifier).state = 0;
-                      context.go(AppRoutes.dashboard);
-                    },
                   ),
-                ),
-                Semantics(
-                  label: 'Log activity navigation button',
-                  button: true,
-                  enabled: true,
-                  selected: currentIndex == 1,
-                  child: _MainNavItem(
-                    isActive: currentIndex == 1,
-                    onTap: () {
-                      ref.read(navigationIndexProvider.notifier).state = 1;
-                      context.go(AppRoutes.log);
-                    },
-                  ),
-                ),
-                Semantics(
-                  label: 'Calendar navigation button',
-                  button: true,
-                  enabled: true,
-                  selected: currentIndex == 2,
-                  child: _NavItem(
-                    icon: AppIcons.calendar(
-                      size: 22,
-                      color: currentIndex == 2 ? AppColors.accent : AppColors.textMuted,
+                  Semantics(
+                    label: 'Log activity navigation button',
+                    button: true,
+                    enabled: true,
+                    selected: currentIndex == 1,
+                    child: _MainNavItem(
+                      isActive: currentIndex == 1,
+                      onTap: () {
+                        ref.read(navigationIndexProvider.notifier).state = 1;
+                        context.go(AppRoutes.log);
+                      },
                     ),
-                    label: 'Calendar',
-                    isActive: currentIndex == 2,
-                    onTap: () {
-                      ref.read(navigationIndexProvider.notifier).state = 2;
-                      context.go(AppRoutes.calendar);
-                    },
                   ),
-                ),
-              ],
-            ),
+                  Semantics(
+                    label: 'Calendar navigation button',
+                    button: true,
+                    enabled: true,
+                    selected: currentIndex == 2,
+                    child: _NavItem(
+                      icon: AppIcons.calendar(
+                        size: 22,
+                        color: currentIndex == 2 ? AppColors.accent : AppColors.textMuted,
+                      ),
+                      label: 'Calendar',
+                      isActive: currentIndex == 2,
+                      onTap: () {
+                        ref.read(navigationIndexProvider.notifier).state = 2;
+                        context.go(AppRoutes.calendar);
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

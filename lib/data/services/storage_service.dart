@@ -6,6 +6,8 @@ import '../models/models.dart';
 class StorageService {
   static const String _activitiesBox = 'activities';
   static const String _settingsBox = 'settings';
+  static const String _trackingSettingsKey = 'tracking_settings';
+  static const String _usageDataKey = 'usage_data';
 
   late Box<ActivityModel> _activitiesBoxInstance;
   late Box<dynamic> _settingsBoxInstance;
@@ -123,6 +125,57 @@ class StorageService {
   Future<AppSettingsModel> updateSettings(AppSettingsModel settings) async {
     await _settingsBoxInstance.put('settings', settings.toJson());
     return settings;
+  }
+
+  // ============ TRACKING SETTINGS ============
+
+  /// Get tracking settings
+  TrackingSettingsModel getTrackingSettings() {
+    final json = _settingsBoxInstance.get(_trackingSettingsKey);
+    if (json == null) return TrackingSettingsModel.defaults;
+    return TrackingSettingsModel.fromJson(Map<String, dynamic>.from(json as Map));
+  }
+
+  /// Update tracking settings
+  Future<TrackingSettingsModel> updateTrackingSettings(TrackingSettingsModel settings) async {
+    await _settingsBoxInstance.put(_trackingSettingsKey, settings.toJson());
+    return settings;
+  }
+
+  /// Update permission granted status
+  Future<void> setPermissionGranted(bool granted) async {
+    final current = getTrackingSettings();
+    await updateTrackingSettings(current.copyWith(permissionGranted: granted));
+  }
+
+  /// Update last sync time
+  Future<void> updateLastSyncTime() async {
+    final current = getTrackingSettings();
+    await updateTrackingSettings(current.copyWith(lastSyncTime: DateTime.now()));
+  }
+
+  /// Mark permission screen as seen
+  Future<void> markPermissionScreenSeen() async {
+    final current = getTrackingSettings();
+    await updateTrackingSettings(current.copyWith(hasSeenPermissionScreen: true));
+  }
+
+  // ============ USAGE DATA ============
+
+  /// Save native usage data
+  Future<void> saveUsageData(List<AppUsageModel> data) async {
+    final jsonList = data.map((e) => e.toJson()).toList();
+    await _settingsBoxInstance.put(_usageDataKey, jsonList);
+  }
+
+  /// Get saved usage data
+  List<AppUsageModel> getUsageData() {
+    final jsonList = _settingsBoxInstance.get(_usageDataKey);
+    if (jsonList == null) return [];
+
+    return (jsonList as List).map((json) {
+      return AppUsageModel.fromJson(Map<String, dynamic>.from(json as Map));
+    }).toList();
   }
 
   // ============ STATISTICS ============

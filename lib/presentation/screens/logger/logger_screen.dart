@@ -1,10 +1,15 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/theme.dart';
 import '../../../data/models/models.dart';
+import '../../../data/services/services.dart';
 import '../../providers/app_providers.dart';
+import '../../providers/usage_providers.dart';
 import '../../widgets/common/app_scaffold.dart';
 import '../../widgets/common/app_icons.dart';
+import '../../widgets/common/app_icon_widget.dart';
+import '../permissions/permission_screen.dart';
 
 /// Logger screen - log time spent on activities
 class LoggerScreen extends ConsumerStatefulWidget {
@@ -23,6 +28,9 @@ class _LoggerScreenState extends ConsumerState<LoggerScreen> {
     final selectedApp = ref.watch(selectedAppProvider);
     final selectedDuration = ref.watch(selectedDurationProvider);
     final isLogging = ref.watch(isLoadingProvider);
+    final topApps = ref.watch(topAppsTodayProvider);
+    final permissionState = ref.watch(usagePermissionProvider);
+    final isAndroid = Platform.isAndroid;
 
     return Stack(
       children: [
@@ -33,6 +41,23 @@ class _LoggerScreenState extends ConsumerState<LoggerScreen> {
               // Header
               _buildHeader(),
               const SizedBox(height: AppSpacing.space6),
+
+              // Platform indicator & permission banner
+              if (isAndroid && !permissionState.isGranted)
+                PermissionBanner(
+                  onRequestPermission: () {
+                    ref.read(usagePermissionProvider.notifier).requestPermission();
+                  },
+                ),
+
+              // iOS mode banner
+              if (!isAndroid) const IOSModeBanner(),
+
+              // Auto-detected apps (Android with permission)
+              if (isAndroid && permissionState.isGranted && topApps.isNotEmpty) ...[
+                _buildDetectedAppsSection(topApps),
+                const SizedBox(height: AppSpacing.space6),
+              ],
 
               // App Selection
               _buildAppSelection(selectedApp),
@@ -66,6 +91,75 @@ class _LoggerScreenState extends ConsumerState<LoggerScreen> {
             ),
           ),
       ],
+    );
+  }
+
+  Widget _buildDetectedAppsSection(List<NativeAppUsage> topApps) {
+    return _AnimatedSection(
+      staggerIndex: 0,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'AUTO-DETECTED TODAY',
+                style: AppTypography.label(color: AppColors.textTertiary).copyWith(
+                  letterSpacing: 0.03,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppColors.productiveSoft,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  'Live',
+                  style: AppTypography.label(color: AppColors.productive).copyWith(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.space3),
+          SizedBox(
+            height: 90,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: topApps.length,
+              itemBuilder: (context, index) {
+                final app = topApps[index];
+                return _DetectedAppCard(
+                  app: app,
+                  onTap: () {
+                    // Create AppInfo from native app and select it
+                    final category = AppPackages.getCategory(app.packageName) ?? app.category;
+                    final appInfo = AppInfo(
+                      name: AppPackages.getDisplayName(app.packageName) ?? app.appName,
+                      icon: AppPackages.getCategoryIcon(category),
+                      color: AppPackages.getCategoryColor(category),
+                      category: category,
+                      isProductive: app.isProductive,
+                      packageName: app.packageName,
+                    );
+                    ref.read(selectedAppProvider.notifier).state = appInfo;
+                    // Also set duration to the detected time
+                    if (app.totalMinutes > 0) {
+                      ref.read(selectedDurationProvider.notifier).state =
+                          app.totalMinutes.clamp(5, 180);
+                    }
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -950,6 +1044,78 @@ class _CustomThumbShape extends SliderComponentShape {
     );
 
     canvas.drawCircle(center, 12, thumbPaint);
+  }
+}
+
+class _DetectedAppCard extends StatefulWidget {
+  final NativeAppUsage app;
+  final VoidCallback onTap;
+
+  const _DetectedAppCard({
+    required this.app,
+    required this.onTap,
+  });
+
+  @override
+  State<_DetectedAppCard> createState() => _DetectedAppCardState();
+}
+
+class _DetectedAppCardState extends State<_DetectedAppCard> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) => setState(() => _isPressed = false),
+      onTapCancel: () => setState(() => _isPressed = false),
+      onTap: widget.onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        transform: Matrix4.identity()..scale(_isPressed ? 0.95 : 1.0),
+        transformAlignment: Alignment.center,
+        margin: const EdgeInsets.only(right: AppSpacing.space3),
+        padding: const EdgeInsets.all(AppSpacing.space3),
+        width: 80,
+        decoration: BoxDecoration(
+          color: AppColors.bgCard,
+          borderRadius: AppSpacing.borderRadiusLg,
+          boxShadow: AppShadows.md,
+          border: Border.all(
+            color: widget.app.isProductive
+                ? AppColors.productive.withOpacity(0.3)
+                : AppColors.accent.withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AppIconWidget(
+              packageName: widget.app.packageName,
+              size: 32,
+              category: widget.app.category,
+            ),
+            const SizedBox(height: AppSpacing.space2),
+            Text(
+              widget.app.appName,
+              style: AppTypography.label(color: AppColors.textPrimary),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+            ),
+            Text(
+              widget.app.formattedTime,
+              style: AppTypography.label(
+                color: widget.app.isProductive
+                    ? AppColors.productive
+                    : AppColors.accent,
+              ).copyWith(fontSize: 10, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

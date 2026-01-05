@@ -5,6 +5,7 @@ import 'core/theme/theme.dart';
 import 'data/services/services.dart';
 import 'presentation/navigation/app_router.dart';
 import 'presentation/providers/app_providers.dart';
+import 'presentation/providers/usage_providers.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,57 +21,29 @@ void main() async {
   final analyticsService = AnalyticsService();
   await analyticsService.init();
 
-  // Generate mock data if empty (for demo purposes)
-  await _initializeDemoData(storageService);
+  // Initialize platform channel service for native tracking
+  final platformChannelService = PlatformChannelService();
+
+  // Initialize icon cache service
+  final iconCacheService = IconCacheService(platformChannelService);
+  await iconCacheService.initialize();
+
+  // Initialize usage tracking service
+  final usageTrackingService = UsageTrackingService(platformChannelService, storageService);
+  await usageTrackingService.initialize();
 
   runApp(
     ProviderScope(
       overrides: [
         storageServiceProvider.overrideWithValue(storageService),
         analyticsServiceProvider.overrideWithValue(analyticsService),
+        platformChannelServiceProvider.overrideWithValue(platformChannelService),
+        iconCacheServiceProvider.overrideWithValue(iconCacheService),
+        usageTrackingServiceProvider.overrideWithValue(usageTrackingService),
       ],
       child: const RealityCheckApp(),
     ),
   );
-}
-
-/// Initialize demo data for first-time users
-Future<void> _initializeDemoData(StorageService storage) async {
-  final activities = storage.getActivities();
-  if (activities.isEmpty) {
-    // Generate 30 days of demo data
-    final now = DateTime.now();
-    
-    for (var i = 0; i < 30; i++) {
-      final date = now.subtract(Duration(days: i));
-      final numActivities = 3 + (i % 5); // 3-7 activities per day
-      
-      for (var j = 0; j < numActivities; j++) {
-        final isProductive = j % 3 == 0; // ~33% productive
-        final categories = isProductive
-            ? ['Work/Study', 'Learning', 'Exercise', 'Reading']
-            : ['Instagram', 'YouTube', 'TikTok', 'Netflix', 'Mobile Games'];
-        final icons = isProductive
-            ? ['📚', '🎓', '🏃', '📖']
-            : ['📸', '▶️', '🎵', '🎥', '📱'];
-        final colors = isProductive
-            ? ['#4ADE80', '#22C55E', '#10B981', '#059669']
-            : ['#E4405F', '#FF0000', '#000000', '#E50914', '#7B68EE'];
-        
-        final idx = j % categories.length;
-        
-        await storage.saveActivity(
-          app: categories[idx],
-          appIcon: icons[idx],
-          appColor: colors[idx],
-          category: isProductive ? 'Productive' : 'Entertainment',
-          duration: 15 + (j * 15) + (i % 3) * 10, // 15-120 minutes
-          isProductive: isProductive,
-          date: DateTime(date.year, date.month, date.day, 8 + j * 2),
-        );
-      }
-    }
-  }
 }
 
 /// Main application widget

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -5,9 +6,12 @@ import '../../../core/theme/theme.dart';
 import '../../../data/services/services.dart';
 import '../../../data/models/time_stats_model.dart';
 import '../../providers/app_providers.dart';
+import '../../providers/usage_providers.dart';
 import '../../widgets/common/app_scaffold.dart';
 import '../../widgets/common/stat_card.dart';
 import '../../widgets/common/app_icons.dart';
+import '../../widgets/common/app_icon_widget.dart';
+import '../permissions/permission_screen.dart';
 
 /// Dashboard screen - main landing page showing weekly stats
 class DashboardScreen extends ConsumerStatefulWidget {
@@ -44,6 +48,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     final potentialEarnings = ref.watch(potentialEarningsProvider);
     final learningDays = ref.watch(learningDaysProvider);
     final chartData = ref.watch(weeklyChartDataProvider);
+    final topApps = ref.watch(topAppsTodayProvider);
+    final permissionState = ref.watch(usagePermissionProvider);
+    final isAndroid = Platform.isAndroid;
 
     return PageWrapper(
       child: Column(
@@ -52,6 +59,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
           // Header
           _buildHeader(),
           const SizedBox(height: AppSpacing.space6),
+
+          // Permission banner (Android only, if not granted)
+          if (isAndroid && !permissionState.isGranted)
+            PermissionBanner(
+              onRequestPermission: () {
+                ref.read(usagePermissionProvider.notifier).requestPermission();
+              },
+            ),
 
           // Hero Stat Card
           StatCard(
@@ -69,6 +84,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
           // Comparison Cards
           _buildComparisonSection(potentialEarnings, learningDays),
           const SizedBox(height: AppSpacing.space6),
+
+          // Top Apps Today (only show if we have native tracking data)
+          if (topApps.isNotEmpty) ...[
+            _buildTopAppsSection(topApps),
+            const SizedBox(height: AppSpacing.space6),
+          ],
 
           // Weekly Chart
           _buildChartSection(chartData),
@@ -234,6 +255,34 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildTopAppsSection(List<NativeAppUsage> topApps) {
+    return _AnimatedSection(
+      staggerIndex: 4,
+      child: Container(
+        padding: AppSpacing.cardPaddingMedium,
+        decoration: BoxDecoration(
+          color: AppColors.bgCard,
+          borderRadius: AppSpacing.borderRadiusXl,
+          boxShadow: AppShadows.md,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const SectionHeader(title: 'Top Apps Today'),
+                _SyncIndicator(),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.space2),
+            ...topApps.map((app) => _TopAppTile(app: app)),
+          ],
+        ),
       ),
     );
   }
@@ -523,6 +572,91 @@ class _LegendItem extends StatelessWidget {
         Text(
           label,
           style: AppTypography.caption(color: AppColors.textSecondary),
+        ),
+      ],
+    );
+  }
+}
+
+class _TopAppTile extends StatelessWidget {
+  final NativeAppUsage app;
+
+  const _TopAppTile({required this.app});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
+      child: Row(
+        children: [
+          AppIconWidget(
+            packageName: app.packageName,
+            size: 40,
+            category: app.category,
+          ),
+          const SizedBox(width: AppSpacing.space3),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  app.appName,
+                  style: AppTypography.body(color: AppColors.textPrimary)
+                      .copyWith(fontWeight: FontWeight.w500),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  app.category,
+                  style: AppTypography.caption(color: AppColors.textSecondary),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            app.formattedTime,
+            style: AppTypography.body(
+              color: app.isProductive ? AppColors.productive : AppColors.accent,
+            ).copyWith(fontWeight: FontWeight.w600),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SyncIndicator extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final lastSync = ref.watch(lastSyncTimeProvider);
+
+    String syncText = 'Never';
+    if (lastSync != null) {
+      final elapsed = DateTime.now().difference(lastSync);
+      if (elapsed.inMinutes < 1) {
+        syncText = 'Just now';
+      } else if (elapsed.inMinutes < 60) {
+        syncText = '${elapsed.inMinutes}m ago';
+      } else {
+        syncText = '${elapsed.inHours}h ago';
+      }
+    }
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 6,
+          height: 6,
+          decoration: BoxDecoration(
+            color: AppColors.productive,
+            borderRadius: BorderRadius.circular(3),
+          ),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          syncText,
+          style: AppTypography.label(color: AppColors.textTertiary),
         ),
       ],
     );

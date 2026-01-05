@@ -31,8 +31,8 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace "com.realitycheck.reality_check"
-    compileSdk flutter.compileSdkVersion
-    ndkVersion flutter.ndkVersion
+    compileSdk 33
+    ndkVersion "25.1.8937393"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -50,7 +50,7 @@ android {
     defaultConfig {
         applicationId "com.realitycheck.reality_check"
         minSdk 21
-        targetSdk flutter.targetSdkVersion
+        targetSdk 33
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }

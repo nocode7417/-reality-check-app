@@ -5,6 +5,7 @@ import 'package:fl_chart/fl_chart.dart';
 import '../../../core/theme/theme.dart';
 import '../../../data/services/services.dart';
 import '../../../data/models/time_stats_model.dart';
+import '../../../data/models/tracking_settings_model.dart';
 import '../../providers/app_providers.dart';
 import '../../providers/usage_providers.dart';
 import '../../widgets/common/app_scaffold.dart';

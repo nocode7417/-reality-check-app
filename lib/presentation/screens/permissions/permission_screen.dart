@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/theme.dart';
+import '../../../data/models/tracking_settings_model.dart';
 import '../../providers/app_providers.dart';
 import '../../providers/usage_providers.dart';
 
@@ -221,7 +222,7 @@ class _PermissionScreenState extends ConsumerState<PermissionScreen>
                                 )
                               : Text(
                                   'Enable Usage Access',
-                                  style: AppTypography.buttonLarge(color: Colors.white),
+                                  style: AppTypography.button(color: Colors.white),
                                 ),
                         ),
                       ),

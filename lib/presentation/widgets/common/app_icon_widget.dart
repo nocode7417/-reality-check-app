@@ -44,7 +44,7 @@ class AppIconWidget extends ConsumerWidget {
         }
         return _buildFallback();
       },
-      loading: () => _buildShimmer(),
+      loading: _buildShimmer,
       error: (_, __) => _buildFallback(),
     );
   }

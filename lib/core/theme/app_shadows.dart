@@ -12,7 +12,7 @@ class AppShadows {
         BoxShadow(
           offset: const Offset(0, 1),
           blurRadius: 2,
-          color: Colors.black.withOpacity(0.04),
+          color: Colors.black.withValues(alpha: 0.04),
         ),
       ];
 
@@ -21,12 +21,12 @@ class AppShadows {
         BoxShadow(
           offset: const Offset(0, 2),
           blurRadius: 8,
-          color: Colors.black.withOpacity(0.04),
+          color: Colors.black.withValues(alpha: 0.04),
         ),
         BoxShadow(
           offset: const Offset(0, 4),
           blurRadius: 16,
-          color: Colors.black.withOpacity(0.04),
+          color: Colors.black.withValues(alpha: 0.04),
         ),
       ];
 
@@ -35,12 +35,12 @@ class AppShadows {
         BoxShadow(
           offset: const Offset(0, 4),
           blurRadius: 12,
-          color: Colors.black.withOpacity(0.05),
+          color: Colors.black.withValues(alpha: 0.05),
         ),
         BoxShadow(
           offset: const Offset(0, 8),
           blurRadius: 32,
-          color: Colors.black.withOpacity(0.08),
+          color: Colors.black.withValues(alpha: 0.08),
         ),
       ];
 
@@ -49,12 +49,12 @@ class AppShadows {
         BoxShadow(
           offset: const Offset(0, 8),
           blurRadius: 24,
-          color: Colors.black.withOpacity(0.06),
+          color: Colors.black.withValues(alpha: 0.06),
         ),
         BoxShadow(
           offset: const Offset(0, 16),
           blurRadius: 48,
-          color: Colors.black.withOpacity(0.1),
+          color: Colors.black.withValues(alpha: 0.1),
         ),
       ];
 
@@ -64,7 +64,7 @@ class AppShadows {
           offset: Offset.zero,
           blurRadius: 0,
           spreadRadius: 4,
-          color: const Color(0xFFFF3B30).withOpacity(0.12),
+          color: const Color(0xFFFF3B30).withValues(alpha: 0.12),
         ),
       ];
 
@@ -74,7 +74,7 @@ class AppShadows {
           offset: Offset.zero,
           blurRadius: 0,
           spreadRadius: 4,
-          color: const Color(0xFF34C759).withOpacity(0.12),
+          color: const Color(0xFF34C759).withValues(alpha: 0.12),
         ),
       ];
 
@@ -83,12 +83,12 @@ class AppShadows {
         BoxShadow(
           offset: const Offset(0, 4),
           blurRadius: 12,
-          color: const Color(0xFFFF3B30).withOpacity(0.25),
+          color: const Color(0xFFFF3B30).withValues(alpha: 0.25),
         ),
         BoxShadow(
           offset: const Offset(0, 8),
           blurRadius: 24,
-          color: const Color(0xFFFF3B30).withOpacity(0.15),
+          color: const Color(0xFFFF3B30).withValues(alpha: 0.15),
         ),
       ];
 
@@ -97,12 +97,12 @@ class AppShadows {
         BoxShadow(
           offset: const Offset(0, 4),
           blurRadius: 12,
-          color: const Color(0xFFFF3B30).withOpacity(0.3),
+          color: const Color(0xFFFF3B30).withValues(alpha: 0.3),
         ),
         BoxShadow(
           offset: const Offset(0, 8),
           blurRadius: 24,
-          color: const Color(0xFFFF3B30).withOpacity(0.2),
+          color: const Color(0xFFFF3B30).withValues(alpha: 0.2),
         ),
       ];
 
@@ -111,29 +111,29 @@ class AppShadows {
         BoxShadow(
           offset: const Offset(0, 2),
           blurRadius: 4,
-          color: Colors.black.withOpacity(0.04),
+          color: Colors.black.withValues(alpha: 0.04),
           blurStyle: BlurStyle.inner,
         ),
       ];
 
   /// Selected day shadow
   static List<BoxShadow> get selectedDay => [
-        BoxShadow(
+        const BoxShadow(
           offset: Offset.zero,
           blurRadius: 0,
           spreadRadius: 2,
           color: Colors.white,
         ),
-        BoxShadow(
+        const BoxShadow(
           offset: Offset.zero,
           blurRadius: 0,
           spreadRadius: 4,
-          color: const Color(0xFFFF3B30),
+          color: Color(0xFFFF3B30),
         ),
         BoxShadow(
           offset: const Offset(0, 4),
           blurRadius: 12,
-          color: Colors.black.withOpacity(0.15),
+          color: Colors.black.withValues(alpha: 0.15),
         ),
       ];
 }

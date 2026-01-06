@@ -149,21 +149,21 @@ class CalculationService {
   static const Map<String, List<String>> _realityMessages = {
     'low': [
       "You're doing better than most. Keep building momentum.",
-      "Solid control over your time. Small improvements compound.",
-      "Good balance. What could you do with even one more hour?",
+      'Solid control over your time. Small improvements compound.',
+      'Good balance. What could you do with even one more hour?',
     ],
     'medium': [
       "You're not alone—most people waste 28hrs/week. But you can do better.",
-      "That time adds up. Imagine redirecting just half of it.",
+      'That time adds up. Imagine redirecting just half of it.',
       "Progress isn't about perfection. Start with one less hour tomorrow.",
     ],
     'high': [
-      "This is a lot, but awareness is the first step to change.",
-      "Every hour you reclaim is an investment in your future self.",
+      'This is a lot, but awareness is the first step to change.',
+      'Every hour you reclaim is an investment in your future self.',
       "It's hard, but here's what's possible if you start small.",
     ],
     'extreme': [
-      "This is a wake-up call. Your time is your most valuable asset.",
+      'This is a wake-up call. Your time is your most valuable asset.',
       "The good news? There's a lot of room for improvement here.",
       "Start with 30 minutes. That's all. Build from there.",
     ],
@@ -246,7 +246,7 @@ class EarningsResult {
     required this.rateUsed,
   });
 
-  String get formatted => '\$${min}–\$$max';
+  String get formatted => '\$$min–\$$max';
 }
 
 /// Skill progress result

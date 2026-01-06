@@ -22,8 +22,8 @@ class BottomNav extends ConsumerWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            AppColors.bgSecondary.withOpacity(0),
-            AppColors.bgSecondary.withOpacity(0.95),
+            AppColors.bgSecondary.withValues(alpha: 0),
+            AppColors.bgSecondary.withValues(alpha: 0.95),
             AppColors.bgSecondary,
           ],
           stops: const [0.0, 0.3, 1.0],
@@ -46,12 +46,12 @@ class BottomNav extends ConsumerWidget {
                   color: AppColors.glass,
                   border: Border(
                     top: BorderSide(
-                      color: Colors.black.withOpacity(0.06),
+                      color: Colors.black.withValues(alpha: 0.06),
                       width: 0.5,
                     ),
                   ),
                 ),
-                child: Opacity(opacity: 0.0, child: SizedBox(height: 60)), // Invisible spacer for layout
+                child: const Opacity(opacity: 0.0, child: SizedBox(height: 60)), // Invisible spacer for layout
               ),
             ),
           ),
@@ -173,7 +173,7 @@ class _NavItemState extends State<_NavItem> with SingleTickerProviderStateMixin 
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-        transform: Matrix4.identity()..scale(_isPressed ? 0.92 : 1.0),
+        transform: Matrix4.diagonal3Values(_isPressed ? 0.92 : 1.0, _isPressed ? 0.92 : 1.0, 1.0),
         transformAlignment: Alignment.center,
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -181,8 +181,7 @@ class _NavItemState extends State<_NavItem> with SingleTickerProviderStateMixin 
             AnimatedContainer(
               duration: const Duration(milliseconds: 250),
               curve: Curves.easeOut,
-              transform: Matrix4.identity()
-                ..translate(0.0, widget.isActive && !_isPressed ? -2.0 : 0.0),
+              transform: Matrix4.translationValues(0.0, widget.isActive && !_isPressed ? -2.0 : 0.0, 0.0),
               child: SizedBox(
                 width: 44,
                 height: 32,
@@ -249,9 +248,7 @@ class _MainNavItemState extends State<_MainNavItem> {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeOut,
-              transform: Matrix4.identity()
-                ..scale(_isPressed ? 0.95 : widget.isActive ? 1.0 : 1.08)
-                ..translate(0.0, _isPressed ? 0.0 : -2.0),
+              transform: _buildNavButtonTransform(_isPressed, widget.isActive),
               transformAlignment: Alignment.center,
               width: AppSpacing.navButtonSize,
               height: AppSpacing.navButtonSize,
@@ -266,12 +263,12 @@ class _MainNavItemState extends State<_MainNavItem> {
                 borderRadius: BorderRadius.circular(28),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.accent.withOpacity(_isPressed ? 0.2 : 0.3),
+                    color: AppColors.accent.withValues(alpha: _isPressed ? 0.2 : 0.3),
                     offset: const Offset(0, 4),
                     blurRadius: 12,
                   ),
                   BoxShadow(
-                    color: AppColors.accent.withOpacity(_isPressed ? 0.1 : 0.2),
+                    color: AppColors.accent.withValues(alpha: _isPressed ? 0.1 : 0.2),
                     offset: const Offset(0, 8),
                     blurRadius: 24,
                   ),
@@ -298,8 +295,11 @@ class _MainNavItemState extends State<_MainNavItem> {
       ),
     );
   }
+
+  Matrix4 _buildNavButtonTransform(bool isPressed, bool isActive) {
+    final scale = isPressed ? 0.95 : isActive ? 1.0 : 1.08;
+    final translateY = isPressed ? 0.0 : -2.0;
+    return Matrix4.diagonal3Values(scale, scale, 1.0)
+      ..setTranslationRaw(0.0, translateY, 0.0);
+  }
 }
-
-
-
-

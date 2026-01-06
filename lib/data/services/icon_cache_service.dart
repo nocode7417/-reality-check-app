@@ -1,4 +1,3 @@
-import 'dart:collection';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:path_provider/path_provider.dart';
@@ -222,7 +221,7 @@ class CacheInfo {
 /// Simple LRU cache implementation
 class _LRUCache<K, V> {
   final int maxSize;
-  final _cache = LinkedHashMap<K, V>();
+  final _cache = <K, V>{};
 
   _LRUCache({required this.maxSize});
 

@@ -152,7 +152,7 @@ class _StatCardState extends State<StatCard> with SingleTickerProviderStateMixin
           Container(
             width: 56,
             height: 56,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.accentSoft,
               borderRadius: AppSpacing.borderRadiusMd,
             ),

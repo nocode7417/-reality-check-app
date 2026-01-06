@@ -63,7 +63,7 @@ class AppTheme {
       ),
 
       // Cards
-      cardTheme: CardThemeData(
+      cardTheme: const CardThemeData(
         color: AppColors.bgCard,
         elevation: 0,
         shape: RoundedRectangleBorder(
@@ -82,7 +82,7 @@ class AppTheme {
             horizontal: AppSpacing.space5,
             vertical: AppSpacing.space4,
           ),
-          shape: RoundedRectangleBorder(
+          shape: const RoundedRectangleBorder(
             borderRadius: AppSpacing.borderRadiusLg,
           ),
           textStyle: AppTypography.button(),
@@ -97,7 +97,7 @@ class AppTheme {
       ),
 
       // Input Decoration
-      inputDecorationTheme: InputDecorationTheme(
+      inputDecorationTheme: const InputDecorationTheme(
         filled: true,
         fillColor: AppColors.neutral,
         border: OutlineInputBorder(
@@ -110,22 +110,22 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppSpacing.borderRadiusMd,
-          borderSide: const BorderSide(color: AppColors.accent, width: 2),
+          borderSide: BorderSide(color: AppColors.accent, width: 2),
         ),
-        contentPadding: const EdgeInsets.symmetric(
+        contentPadding: EdgeInsets.symmetric(
           horizontal: AppSpacing.space4,
           vertical: AppSpacing.space3,
         ),
       ),
 
       // Slider
-      sliderTheme: SliderThemeData(
+      sliderTheme: const SliderThemeData(
         activeTrackColor: AppColors.accent,
         inactiveTrackColor: AppColors.neutralLight,
         thumbColor: Colors.white,
         overlayColor: AppColors.accentSoft,
         trackHeight: 6,
-        thumbShape: const RoundSliderThumbShape(
+        thumbShape: RoundSliderThumbShape(
           enabledThumbRadius: 12,
           elevation: 4,
         ),
@@ -216,8 +216,8 @@ class AppTheme {
       ),
 
       // Cards
-      cardTheme: CardThemeData(
-        color: const Color(0xFF1C1C1E),
+      cardTheme: const CardThemeData(
+        color: Color(0xFF1C1C1E),
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: AppSpacing.borderRadiusXl,
@@ -235,7 +235,7 @@ class AppTheme {
             horizontal: AppSpacing.space5,
             vertical: AppSpacing.space4,
           ),
-          shape: RoundedRectangleBorder(
+          shape: const RoundedRectangleBorder(
             borderRadius: AppSpacing.borderRadiusLg,
           ),
           textStyle: AppTypography.button(),
@@ -250,9 +250,9 @@ class AppTheme {
       ),
 
       // Input Decoration
-      inputDecorationTheme: InputDecorationTheme(
+      inputDecorationTheme: const InputDecorationTheme(
         filled: true,
-        fillColor: const Color(0xFF2C2C2E),
+        fillColor: Color(0xFF2C2C2E),
         border: OutlineInputBorder(
           borderRadius: AppSpacing.borderRadiusMd,
           borderSide: BorderSide.none,
@@ -263,22 +263,22 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppSpacing.borderRadiusMd,
-          borderSide: const BorderSide(color: AppColors.accent, width: 2),
+          borderSide: BorderSide(color: AppColors.accent, width: 2),
         ),
-        contentPadding: const EdgeInsets.symmetric(
+        contentPadding: EdgeInsets.symmetric(
           horizontal: AppSpacing.space4,
           vertical: AppSpacing.space3,
         ),
       ),
 
       // Slider
-      sliderTheme: SliderThemeData(
+      sliderTheme: const SliderThemeData(
         activeTrackColor: AppColors.accent,
-        inactiveTrackColor: const Color(0xFF3A3A3C),
+        inactiveTrackColor: Color(0xFF3A3A3C),
         thumbColor: Colors.white,
         overlayColor: AppColors.accentSoft,
         trackHeight: 6,
-        thumbShape: const RoundSliderThumbShape(
+        thumbShape: RoundSliderThumbShape(
           enabledThumbRadius: 12,
           elevation: 4,
         ),

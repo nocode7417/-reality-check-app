@@ -438,10 +438,10 @@ class _TimeCalendar extends StatelessWidget {
           style: AppTypography.label(color: AppColors.textMuted),
         ),
         const SizedBox(width: AppSpacing.space2),
-        _LegendSwatch(color: AppColors.intensityNone),
-        _LegendSwatch(color: AppColors.intensityLow),
-        _LegendSwatch(color: AppColors.intensityMedium),
-        _LegendSwatch(color: AppColors.intensityExtreme),
+        const _LegendSwatch(color: AppColors.intensityNone),
+        const _LegendSwatch(color: AppColors.intensityLow),
+        const _LegendSwatch(color: AppColors.intensityMedium),
+        const _LegendSwatch(color: AppColors.intensityExtreme),
         const SizedBox(width: AppSpacing.space2),
         Text(
           'More',
@@ -460,7 +460,7 @@ class _TimeCalendar extends StatelessWidget {
       curve: Curves.easeOut,
       margin: const EdgeInsets.only(top: AppSpacing.space4),
       padding: AppSpacing.cardPaddingSmall,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.neutral,
         borderRadius: AppSpacing.borderRadiusLg,
       ),

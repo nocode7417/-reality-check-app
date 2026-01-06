@@ -181,9 +181,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
+                          const Text(
                             '📊',
-                            style: const TextStyle(fontSize: 32),
+                            style: TextStyle(fontSize: 32),
                           ),
                           const SizedBox(height: AppSpacing.space2),
                           Text(
@@ -213,11 +213,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
   }
 
   Widget _buildLegend() {
-    return Row(
+    return const Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _LegendItem(color: AppColors.accent, label: 'Wasted'),
-        const SizedBox(width: AppSpacing.space6),
+        SizedBox(width: AppSpacing.space6),
         _LegendItem(color: AppColors.productive, label: 'Productive'),
       ],
     );

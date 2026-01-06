@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/theme.dart';
 import '../../../data/models/tracking_settings_model.dart';
-import '../../providers/app_providers.dart';
 import '../../providers/usage_providers.dart';
 
 /// Permission screen for requesting usage access
@@ -25,7 +24,6 @@ class _PermissionScreenState extends ConsumerState<PermissionScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animController;
   bool _isRequesting = false;
-  bool _showTroubleshoot = false;
 
   @override
   void initState() {
@@ -162,38 +160,38 @@ class _PermissionScreenState extends ConsumerState<PermissionScreen>
                 child: Column(
                   children: isAndroid
                       ? [
-                          _FeatureItem(
+                          const _FeatureItem(
                             icon: '🔒',
                             title: 'Private & Secure',
                             description: 'Data stays on your device only',
                           ),
                           const SizedBox(height: AppSpacing.space4),
-                          _FeatureItem(
+                          const _FeatureItem(
                             icon: '🔋',
                             title: 'Battery Efficient',
                             description: 'Minimal impact on battery life',
                           ),
                           const SizedBox(height: AppSpacing.space4),
-                          _FeatureItem(
+                          const _FeatureItem(
                             icon: '📱',
                             title: 'Auto Detection',
                             description: 'Tracks TikTok, Instagram, games & more',
                           ),
                         ]
                       : [
-                          _FeatureItem(
+                          const _FeatureItem(
                             icon: '✏️',
                             title: 'Quick Logging',
                             description: 'Log activities in just a few taps',
                           ),
                           const SizedBox(height: AppSpacing.space4),
-                          _FeatureItem(
+                          const _FeatureItem(
                             icon: '📈',
                             title: 'Track Progress',
                             description: 'See your habits and patterns',
                           ),
                           const SizedBox(height: AppSpacing.space4),
-                          _FeatureItem(
+                          const _FeatureItem(
                             icon: '🎯',
                             title: 'Stay Accountable',
                             description: 'Build awareness of your time',
@@ -538,19 +536,19 @@ class _RestrictedSettingsSheet extends StatelessWidget {
           Text('Follow these steps:', style: AppTypography.sectionTitle()),
           const SizedBox(height: AppSpacing.space4),
 
-          _StepItem(
+          const _StepItem(
             number: '1',
             title: 'Open App Settings',
             description: 'Tap button below to go to Reality Check app info',
           ),
           const SizedBox(height: AppSpacing.space3),
-          _StepItem(
+          const _StepItem(
             number: '2',
             title: 'Find "Allow restricted settings"',
             description: 'Tap ⋮ menu (top right) → "Allow restricted settings"',
           ),
           const SizedBox(height: AppSpacing.space3),
-          _StepItem(
+          const _StepItem(
             number: '3',
             title: 'Enable Usage Access',
             description: 'Go back and enable Usage Access for Reality Check',
@@ -566,7 +564,7 @@ class _RestrictedSettingsSheet extends StatelessWidget {
                   onPressed: onOpenAppSettings,
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.accent,
-                    side: BorderSide(color: AppColors.accent),
+                    side: const BorderSide(color: AppColors.accent),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),

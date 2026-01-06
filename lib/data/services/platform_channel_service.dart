@@ -38,6 +38,64 @@ class PlatformChannelService {
     }
   }
 
+  /// Open app settings (for "Allow restricted settings" on Android 13+)
+  Future<void> openAppSettings() async {
+    if (!isNativeTrackingAvailable) return;
+
+    try {
+      await _channel.invokeMethod('openAppSettings');
+    } on PlatformException {
+      // Failed to open settings
+    }
+  }
+
+  /// Open usage access settings directly
+  Future<void> openUsageAccessSettings() async {
+    if (!isNativeTrackingAvailable) return;
+
+    try {
+      await _channel.invokeMethod('openUsageAccessSettings');
+    } on PlatformException {
+      // Failed to open settings
+    }
+  }
+
+  /// Get Android SDK version
+  Future<int> getAndroidVersion() async {
+    if (!isNativeTrackingAvailable) return 0;
+
+    try {
+      final result = await _channel.invokeMethod<int>('getAndroidVersion');
+      return result ?? 0;
+    } on PlatformException {
+      return 0;
+    }
+  }
+
+  /// Check if device is Android 13+ (has restricted settings)
+  Future<bool> isRestrictedSettingsDevice() async {
+    if (!isNativeTrackingAvailable) return false;
+
+    try {
+      final result = await _channel.invokeMethod<bool>('isRestrictedSettingsDevice');
+      return result ?? false;
+    } on PlatformException {
+      return false;
+    }
+  }
+
+  /// Get package name
+  Future<String> getPackageName() async {
+    if (!isNativeTrackingAvailable) return '';
+
+    try {
+      final result = await _channel.invokeMethod<String>('getPackageName');
+      return result ?? '';
+    } on PlatformException {
+      return '';
+    }
+  }
+
   /// Get usage stats for a time range
   Future<List<NativeAppUsage>> getUsageStats({
     required DateTime startTime,

@@ -12,10 +12,12 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Build
 import android.os.Process
 import android.provider.Settings
 import android.util.Base64
+import android.util.Log
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
@@ -69,6 +71,24 @@ class UsageStatsPlugin private constructor(
             "requestUsagePermission" -> {
                 requestUsageStatsPermission()
                 result.success(null)
+            }
+            "openAppSettings" -> {
+                openAppSettings()
+                result.success(null)
+            }
+            "openUsageAccessSettings" -> {
+                openUsageAccessSettings()
+                result.success(null)
+            }
+            "getAndroidVersion" -> {
+                result.success(Build.VERSION.SDK_INT)
+            }
+            "getPackageName" -> {
+                result.success(context.packageName)
+            }
+            "isRestrictedSettingsDevice" -> {
+                // Android 13+ has restricted settings for sideloaded apps
+                result.success(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
             }
             "getUsageStats" -> {
                 val startTime = call.argument<Long>("startTime") ?: 0L
@@ -186,9 +206,45 @@ class UsageStatsPlugin private constructor(
     }
 
     private fun requestUsageStatsPermission() {
-        val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        context.startActivity(intent)
+        openUsageAccessSettings()
+    }
+
+    private fun openUsageAccessSettings() {
+        try {
+            // Try to open usage access settings directly for this app (Android 10+)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS).apply {
+                    data = Uri.parse("package:${context.packageName}")
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+                context.startActivity(intent)
+            } else {
+                // Fallback to general usage access settings
+                val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+                context.startActivity(intent)
+            }
+        } catch (e: Exception) {
+            // Fallback if direct intent fails
+            Log.w("UsageStatsPlugin", "Failed to open usage settings directly, using fallback", e)
+            val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+            context.startActivity(intent)
+        }
+    }
+
+    private fun openAppSettings() {
+        try {
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = Uri.parse("package:${context.packageName}")
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            Log.e("UsageStatsPlugin", "Failed to open app settings", e)
+        }
     }
 
     private suspend fun getUsageStats(startTime: Long, endTime: Long): List<Map<String, Any?>> =

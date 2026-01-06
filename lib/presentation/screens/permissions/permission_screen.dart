@@ -25,6 +25,7 @@ class _PermissionScreenState extends ConsumerState<PermissionScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animController;
   bool _isRequesting = false;
+  bool _showTroubleshoot = false;
 
   @override
   void initState() {
@@ -53,19 +54,31 @@ class _PermissionScreenState extends ConsumerState<PermissionScreen>
 
     setState(() => _isRequesting = false);
 
-    // Show a snackbar telling user to come back after enabling
+    // Show troubleshoot dialog for Android 13+ restricted settings
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Enable "Usage Access" for Reality Check in Settings'),
-          duration: const Duration(seconds: 4),
-          action: SnackBarAction(
-            label: 'Got it',
-            onPressed: () {},
-          ),
-        ),
-      );
+      _showRestrictedSettingsHelp();
     }
+  }
+
+  void _showRestrictedSettingsHelp() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.bgCard,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) => _RestrictedSettingsSheet(
+        onOpenAppSettings: () {
+          Navigator.pop(context);
+          ref.read(platformChannelServiceProvider).openAppSettings();
+        },
+        onOpenUsageSettings: () {
+          Navigator.pop(context);
+          ref.read(platformChannelServiceProvider).openUsageAccessSettings();
+        },
+      ),
+    );
   }
 
   void _skip() {
@@ -430,6 +443,270 @@ class IOSModeBanner extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Bottom sheet for Android 13+ restricted settings help
+class _RestrictedSettingsSheet extends StatelessWidget {
+  final VoidCallback onOpenAppSettings;
+  final VoidCallback onOpenUsageSettings;
+
+  const _RestrictedSettingsSheet({
+    required this.onOpenAppSettings,
+    required this.onOpenUsageSettings,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: AppSpacing.space6,
+        right: AppSpacing.space6,
+        top: AppSpacing.space6,
+        bottom: MediaQuery.of(context).viewInsets.bottom + AppSpacing.space6,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Handle bar
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.borderLight,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.space6),
+
+          // Title
+          Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Colors.orange.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Center(
+                  child: Text('🔐', style: TextStyle(fontSize: 24)),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.space4),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Permission Blocked?',
+                      style: AppTypography.subheading(),
+                    ),
+                    Text(
+                      'Android 13+ security feature',
+                      style: AppTypography.caption(color: AppColors.textSecondary),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: AppSpacing.space6),
+
+          // Explanation
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.space4),
+            decoration: BoxDecoration(
+              color: Colors.orange.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.orange.withOpacity(0.2)),
+            ),
+            child: Text(
+              'If you see "App was denied access" or can\'t toggle Usage Access, your device has "Restricted Settings" enabled for sideloaded apps.',
+              style: AppTypography.body(color: AppColors.textSecondary),
+            ),
+          ),
+
+          const SizedBox(height: AppSpacing.space6),
+
+          // Steps
+          Text('Follow these steps:', style: AppTypography.sectionTitle()),
+          const SizedBox(height: AppSpacing.space4),
+
+          _StepItem(
+            number: '1',
+            title: 'Open App Settings',
+            description: 'Tap button below to go to Reality Check app info',
+          ),
+          const SizedBox(height: AppSpacing.space3),
+          _StepItem(
+            number: '2',
+            title: 'Find "Allow restricted settings"',
+            description: 'Tap ⋮ menu (top right) → "Allow restricted settings"',
+          ),
+          const SizedBox(height: AppSpacing.space3),
+          _StepItem(
+            number: '3',
+            title: 'Enable Usage Access',
+            description: 'Go back and enable Usage Access for Reality Check',
+          ),
+
+          const SizedBox(height: AppSpacing.space6),
+
+          // Buttons
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: onOpenAppSettings,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.accent,
+                    side: BorderSide(color: AppColors.accent),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    'App Settings',
+                    style: AppTypography.button(color: AppColors.accent),
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.space4),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: onOpenUsageSettings,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.accent,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    'Usage Access',
+                    style: AppTypography.button(color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: AppSpacing.space4),
+
+          // ADB hint for developers
+          Center(
+            child: TextButton(
+              onPressed: () => _showAdbHelp(context),
+              child: Text(
+                'Developer? Use ADB command',
+                style: AppTypography.caption(color: AppColors.textMuted),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAdbHelp(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.bgCard,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text('ADB Command', style: AppTypography.subheading()),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Run this command to grant permission directly:',
+              style: AppTypography.body(color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: AppSpacing.space4),
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.space3),
+              decoration: BoxDecoration(
+                color: AppColors.bgSecondary,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: SelectableText(
+                'adb shell appops set com.realitycheck.reality_check GET_USAGE_STATS allow',
+                style: AppTypography.caption(color: AppColors.accent)
+                    .copyWith(fontFamily: 'monospace'),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Got it', style: AppTypography.button(color: AppColors.accent)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StepItem extends StatelessWidget {
+  final String number;
+  final String title;
+  final String description;
+
+  const _StepItem({
+    required this.number,
+    required this.title,
+    required this.description,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 28,
+          height: 28,
+          decoration: BoxDecoration(
+            color: AppColors.accent.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Center(
+            child: Text(
+              number,
+              style: AppTypography.caption(color: AppColors.accent)
+                  .copyWith(fontWeight: FontWeight.w600),
+            ),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.space3),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: AppTypography.body(color: AppColors.textPrimary)
+                    .copyWith(fontWeight: FontWeight.w600),
+              ),
+              Text(
+                description,
+                style: AppTypography.caption(color: AppColors.textSecondary),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

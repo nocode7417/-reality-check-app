@@ -26,7 +26,8 @@ import java.util.Calendar
 
 class UsageStatsPlugin private constructor(
     private val context: Context,
-    private val activity: Activity
+    private val activity: Activity,
+    flutterEngine: FlutterEngine
 ) : MethodChannel.MethodCallHandler, EventChannel.StreamHandler {
 
     private val methodChannel: MethodChannel
@@ -42,7 +43,7 @@ class UsageStatsPlugin private constructor(
 
         fun registerWith(flutterEngine: FlutterEngine, activity: Activity) {
             instance?.dispose()
-            instance = UsageStatsPlugin(activity.applicationContext, activity).apply {
+            instance = UsageStatsPlugin(activity.applicationContext, activity, flutterEngine).apply {
                 methodChannel.setMethodCallHandler(this)
                 eventChannel.setStreamHandler(this)
             }
@@ -51,13 +52,11 @@ class UsageStatsPlugin private constructor(
 
     init {
         methodChannel = MethodChannel(
-            activity.flutterEngine?.dartExecutor?.binaryMessenger
-                ?: throw IllegalStateException("Flutter engine not available"),
+            flutterEngine.dartExecutor.binaryMessenger,
             METHOD_CHANNEL
         )
         eventChannel = EventChannel(
-            activity.flutterEngine?.dartExecutor?.binaryMessenger
-                ?: throw IllegalStateException("Flutter engine not available"),
+            flutterEngine.dartExecutor.binaryMessenger,
             EVENT_CHANNEL
         )
     }
